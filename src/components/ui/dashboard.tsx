@@ -6,10 +6,10 @@ import { useState } from "react"
 import { IoMdPower } from "react-icons/io"
 import { DEFAULT_API_LINK } from "../../route"
 import Cookies from 'js-cookie';
+import PcAlive from "./pc-alive"
 
 const Dashboard = () => {
 
-  const [pcAlive, isPcAlive] = useState(false);
   const [loadingPowerOn, setLoadingPowerOn] = useState(false);
   const [loadingPowerOff, setLoadingPowerOff] = useState(false);
   const [loadingHibernate, setLoadingHibernate] = useState(false);
@@ -21,7 +21,7 @@ const Dashboard = () => {
         method: 'POST',
         body: JSON.stringify({ action: type }),
         headers: {
-          'authorization': 'Barer ' + Cookies.get('token'),
+          'authorization': 'Bearer ' + Cookies.get('token'),
           'Content-Type': 'application/json'
         }
       })
@@ -83,8 +83,7 @@ const Dashboard = () => {
         </CardBody>
         <Divider />
         <CardFooter className="flex gap-2 items-center justify-center py-4 px-5">
-          <p>Current state of your pc :</p>
-          <span className={`w-4 h-4 ${pcAlive ? 'bg-green-400' : 'bg-red-400'} rounded-full`}></span> 
+          <PcAlive />
         </CardFooter>
       </Card>
     </>

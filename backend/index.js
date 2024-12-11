@@ -70,7 +70,9 @@ app.post('/api/login', (req, res) => {
     if(!password) return res.status(404).json({ error: "Please, fill a password." });
     if(password === process.env.PASSWORD) {
         const token = jwt.sign({ password: password }, process.env.SECRET, { expiresIn: '30d' });
-        res.cookie('token', token)
+        res.cookie('token', token, {
+            maxAge: 30 * 24 * 60 * 60 * 1000
+        })
         return res.sendStatus(200);
     } else {
         return res.status(403).json({ error: "Wrong password." });
