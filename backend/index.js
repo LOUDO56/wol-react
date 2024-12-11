@@ -31,13 +31,32 @@ const isAuthorized = (req, res, next) => {
 }
 
 
-app.post('/api/action', isAuthorized, (req, res) => {
+app.post('/api/raspb/action', isAuthorized, (req, res) => {
     const action = req.body.action;
     let cmd;
     switch (action) {
         case "wake-up":
             cmd = 'wakeonlan ' + process.env.MAC_ADDRESS;
             break;
+        case "shutdown":
+            cmd = "shutdown -s -f -t 1"
+            break;
+        case "hibernate":
+            cmd = 'shutdown -h'
+            break;
+    }
+    exec(cmd, (err, stdout, stderr) => {
+        if(err || stderr) return res.status(400).json({ error: JSON.stringify(err) });
+        else {
+            return res.sendStatus(200)
+        }
+    });
+});
+
+app.post('/api/pc/action', isAuthorized, (req, res) => {
+    const action = req.body.action;
+    let cmd;
+    switch (action) {
         case "shutdown":
             cmd = "shutdown -s -f -t 1"
             break;

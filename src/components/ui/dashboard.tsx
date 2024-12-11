@@ -17,7 +17,8 @@ const Dashboard = () => {
   const action = async (loading: Function, type: "wake-up" | "shutdown" | "hibernate") => {
     loading(true)
     try {
-      const result = await fetch(DEFAULT_API_LINK + '/action', {
+      const platform = type === 'wake-up' ? 'raspb' : 'pc';
+      const result = await fetch(DEFAULT_API_LINK + '/' + platform + '/action', {
         method: 'POST',
         body: JSON.stringify({ action: type }),
         headers: {
