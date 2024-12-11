@@ -4,6 +4,7 @@ import { MdElectricBolt, MdNightlightRound } from "react-icons/md"
 import { FaPowerOff } from "react-icons/fa"
 import { toast, Toaster } from "sonner"
 import { useState } from "react"
+import { IoMdPower } from "react-icons/io"
 
 function App() {
 
@@ -41,7 +42,7 @@ function App() {
     <>
       <Toaster richColors position="top-center" />
       <Card>
-        <CardHeader  className="py-5 text-lg font-bold flex justify-center">
+        <CardHeader className="py-5 text-lg font-bold flex justify-center">
           Dashboard 
         </CardHeader>
         <Divider />
@@ -54,7 +55,7 @@ function App() {
             loading={loadingPowerOn} 
           />
           <ButtonAction 
-            Icon={FaPowerOff} 
+            Icon={IoMdPower} 
             label="Shuting down" 
             color="danger" 
             onClick={powerOff} 

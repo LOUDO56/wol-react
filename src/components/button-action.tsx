@@ -21,11 +21,11 @@ const ButtonAction = ({
     <Button 
       radius='sm'
       color={color}
-      className='flex gap-2 items-center'
+      className='flex gap-2 items-center justify-center'
       onClick={onClick}
       isDisabled={loading}
     >
-      <Icon size={14} />
+      <Icon size={15} />
       <p>{label}</p>
     </Button>
   )
