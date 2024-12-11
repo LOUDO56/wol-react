@@ -11,11 +11,11 @@ const LoginForm = () => {
     const data = Object.fromEntries(new FormData(e.currentTarget));
 
     if(!data.password) {
-      setErrors({ password: "Fdp met un mdp" })
+      setErrors({ password: "Password is required." })
       return;
     }
 
-    const res = await fetch('http://localhost:3000' + '/login', {
+    const res = await fetch(DEFAULT_API_LINK + '/login', {
       method: "POST",
       body: JSON.stringify({ password: data.password }),
       credentials: 'include',
