@@ -3,6 +3,8 @@ import jwt from 'jsonwebtoken';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import cookieParser from "cookie-parser";
+import { exec } from 'child_process';
+import { stderr } from "process";
 
 dotenv.config({ path: '../.env' });
 const app = express();
@@ -27,11 +29,29 @@ const isAuthorized = (req, res, next) => {
 }
 
 
-app.get('/wake-up', isAuthorized, (req, res) => {
-    
+app.post('/api/action', isAuthorized, (req, res) => {
+    const action = req.body.action;
+    let cmd;
+    switch (action) {
+        case "wake-up":
+            cmd = 'wakeonlan ' + process.env.MAC_ADDRESS;
+            break;
+        case "shutdown":
+            cmd = "shutdown -s -f -t 1"
+            break;
+        case "hibernate":
+            cmd = 'shutdown -h'
+            break;
+    }
+    exec(cmd, (err, stdout, stderr) => {
+        if(err || stderr) return res.status(400).json({ error: err });
+        else {
+            return res.status(200);
+        }
+    });
 });
 
-app.post('/login', (req, res) => {
+app.post('/api/login', (req, res) => {
     const password = req.body.password;
     console.log(req.body);
     if(!password) return res.status(404).json({ error: "Please, fill a password." });
