@@ -52,7 +52,7 @@ app.post('/api/action', isAuthorized, (req, res) => {
     });
 });
 
-app.post('/api/is-alive', isAuthorized, (req, res) => {
+app.get('/api/is-alive', isAuthorized, (req, res) => {
    try {
         ping.sys.probe(localIp, (isAlive) => {
             if(isAlive) return res.status(200).json({ online: true });
@@ -61,6 +61,11 @@ app.post('/api/is-alive', isAuthorized, (req, res) => {
    } catch (error) {
         return res.status(400).json({ error: error });
    }
+})
+
+app.get('/api/is-connected', (req, res) => {
+    if(!req.cookies.token) return res.status(200).json({ isConnected: false });
+    else return res.status(200).json({ isConnected: true })
 })
 
 app.post('/api/login', (req, res) => {
