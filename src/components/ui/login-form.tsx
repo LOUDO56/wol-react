@@ -1,7 +1,6 @@
 import { Button, Form, Input } from '@nextui-org/react'
-import React, { FormEvent, useState } from 'react'
+import { FormEvent, useState } from 'react'
 import { DEFAULT_API_LINK } from '../../route';
-import Dashboard from './dashboard';
 
 const LoginForm = () => {
 
