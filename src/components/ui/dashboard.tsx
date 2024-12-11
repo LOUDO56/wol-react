@@ -4,6 +4,8 @@ import { MdElectricBolt, MdNightlightRound } from "react-icons/md"
 import { toast, Toaster } from "sonner"
 import { useState } from "react"
 import { IoMdPower } from "react-icons/io"
+import { DEFAULT_API_LINK } from "../../route"
+import Cookies from 'js-cookie';
 
 const Dashboard = () => {
 
@@ -12,29 +14,40 @@ const Dashboard = () => {
   const [loadingPowerOff, setLoadingPowerOff] = useState(false);
   const [loadingHibernate, setLoadingHibernate] = useState(false);
 
-  const powerOn = () => {
-    setLoadingPowerOn(true)
-    toast.success("Your pc is being power on...")
-    setTimeout(() => {
-      setLoadingPowerOn(false)
-    }, 1000);
+  const action = async (loading: Function, type: "wake-up" | "shutdown" | "hibernate") => {
+    loading(true)
+    try {
+      const result = await fetch(DEFAULT_API_LINK + '/action', {
+        method: 'POST',
+        body: JSON.stringify({ action: type }),
+        headers: {
+          'authorization': 'Barer ' + Cookies.get('token'),
+          'Content-Type': 'application/json'
+        }
+      })
+      if(!result.ok) {
+        const data = await result.json();
+        toast.error('Your pc could not ' + type + ': ' + data.error)
+      } else {
+        switch (type) {
+          case "wake-up":
+            toast.success("Your pc is being power on...")
+            break;
+          case "shutdown":
+            toast.success("Your pc is shutting down...")
+            break;
+          case "hibernate":
+            toast.success("Your pc is hibernating...")
+            break;
+        }
+      }
+    } catch (error) {
+      toast.error('Error while sending the request: ' + error)
+    } finally {
+      loading(false)
+    }
   }
 
-  const powerOff = () => {
-    setLoadingPowerOff(true)
-    toast.success("Your pc is is being shutdown...")
-    setTimeout(() => {
-      setLoadingPowerOff(false)
-    }, 1000);
-  }
-
-  const powerHibernate = () => {
-    setLoadingHibernate(true)
-    toast.success("Your pc is going to sleep...")
-    setTimeout(() => {
-      setLoadingHibernate(false)
-    }, 1000);
-  }
 
 
   return (
@@ -50,21 +63,21 @@ const Dashboard = () => {
             Icon={MdElectricBolt} 
             label="Waking up" 
             color="success" 
-            onClick={powerOn} 
+            onClick={() => action(setLoadingPowerOn, 'wake-up')} 
             loading={loadingPowerOn} 
           />
           <ButtonAction 
             Icon={IoMdPower} 
             label="Shuting down" 
             color="danger" 
-            onClick={powerOff} 
+            onClick={() => action(setLoadingPowerOff, 'shutdown')} 
             loading={loadingPowerOff} 
           />
           <ButtonAction
             Icon={MdNightlightRound} 
             label="Hibernate" 
             color="warning"
-            onClick={powerHibernate} 
+            onClick={() => action(setLoadingHibernate, 'hibernate')} 
             loading={loadingHibernate} 
           />
         </CardBody>

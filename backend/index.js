@@ -6,7 +6,7 @@ import cookieParser from "cookie-parser";
 import { exec } from 'child_process';
 import ping from 'ping';
 
-dotenv.config({ path: '../.env' });
+dotenv.config({ path: '.env' });
 const app = express();
 const port = 3000;
 app.use(express.json());
@@ -15,10 +15,11 @@ app.use(cors({
     credentials: true
 }));
 app.use(cookieParser());
-const localIp = '192.18.1.25'
+const localIp = '192.168.1.25'
 
 const isAuthorized = (req, res, next) => {
-    const token = req.cookies.token;
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
     if (!token) return res.status(403).json({ error: "Unauthorized." });
     try {
         const decoded = jwt.verify(token, process.env.SECRET)
@@ -45,9 +46,9 @@ app.post('/api/action', isAuthorized, (req, res) => {
             break;
     }
     exec(cmd, (err, stdout, stderr) => {
-        if(err || stderr) return res.status(400).json({ error: err });
+        if(err || stderr) return res.status(400).json({ error: JSON.stringify(err) });
         else {
-            return res.status(200);
+            return res.sendStatus(200)
         }
     });
 });
@@ -63,23 +64,14 @@ app.get('/api/is-alive', isAuthorized, (req, res) => {
    }
 })
 
-app.get('/api/is-connected', (req, res) => {
-    if(!req.cookies.token) return res.status(200).json({ isConnected: false });
-    else return res.status(200).json({ isConnected: true })
-})
 
 app.post('/api/login', (req, res) => {
     const password = req.body.password;
     if(!password) return res.status(404).json({ error: "Please, fill a password." });
-
     if(password === process.env.PASSWORD) {
         const token = jwt.sign({ password: password }, process.env.SECRET, { expiresIn: '30d' });
-        res.cookie('token', token, {
-            httpOnly: true,
-            sameSite: "none",
-            secure: process.env.NODE_ENV === 'production',
-        });
-        return res.status(200)
+        res.cookie('token', token)
+        return res.sendStatus(200);
     } else {
         return res.status(403).json({ error: "Wrong password." });
     }

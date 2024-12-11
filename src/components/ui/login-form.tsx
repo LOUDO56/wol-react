@@ -1,32 +1,47 @@
-import { Button, Card, CardBody, CardFooter, CardHeader, Form, Input } from '@nextui-org/react'
+import { Button, Form, Input } from '@nextui-org/react'
 import React, { FormEvent, useState } from 'react'
 import { DEFAULT_API_LINK } from '../../route';
+import Dashboard from './dashboard';
 
 const LoginForm = () => {
 
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const data = Object.fromEntries(new FormData(e.currentTarget));
-
+    
     if(!data.password) {
       setErrors({ password: "Password is required." })
       return;
     }
+    
+    setLoading(true);
 
-    const res = await fetch(DEFAULT_API_LINK + '/login', {
-      method: "POST",
-      body: JSON.stringify({ password: data.password }),
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json'
+    try {
+      const res = await fetch(DEFAULT_API_LINK + '/login', {
+        method: "POST",
+        body: JSON.stringify({ password: data.password }),
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+  
+      const result = await res.json();
+      setErrors({ password: result.error })
+
+      if(res.ok){
+        window.location.reload();
       }
-    })
 
-    const result = await res.json()
 
-    setErrors({ password: result.error })
+    } catch (error) {
+      setErrors({ password: error })
+    } finally {
+      setLoading(false);
+    }
 
   }
 
@@ -43,7 +58,7 @@ const LoginForm = () => {
           name='password'
           type='password'
         />
-        <Button type='submit' color='primary'>Submit</Button>
+        <Button type='submit' color='primary' isLoading={loading}>Submit</Button>
     </Form>
   )
 }
