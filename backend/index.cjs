@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const cookieParser = require("cookie-parser");
-const { exec } = require('child_process');
+const { exec, spawn } = require('child_process');
 const ping = require('ping');
 
 dotenv.config({ path: '.env' });
@@ -55,21 +55,31 @@ app.post('/api/raspb/action', isAuthorized, (req, res) => {
 
 app.post('/api/pc/action', isAuthorized, (req, res) => {
     const action = req.body.action;
-    let cmd;
     switch (action) {
         case "shutdown":
-            cmd = "shutdown -s -f -t 1"
+            exec("shutdown -s -f -t 1", (err, stdout, stderr) => {
+                if(err || stderr) return res.status(400).json({ error: JSON.stringify(err) });
+                else {
+                    return res.sendStatus(200)
+                }
+            });
             break;
         case "hibernate":
-            cmd = 'timeout /t 2 /nobreak && rundll32.exe powrprof.dll,SetSuspendState Hibernate'
+            try {
+                const bat = spawn('cmd.exe', ['/c','hibernate.bat']);
+
+                bat.stdout.on('data', (data) => {
+                    return res.sendStatus(200);
+                })
+
+                bat.stderr.on('data', (data) => {
+                    return res.status(400).json({ error: JSON.stringify(data) });
+                })
+            } catch (error) {
+                return res.status(400).json({ error: JSON.stringify(error) });
+            }
             break;
     }
-    exec(cmd, (err, stdout, stderr) => {
-        if(err || stderr) return res.status(400).json({ error: JSON.stringify(err) });
-        else {
-            return res.sendStatus(200)
-        }
-    });
 });
 
 app.get('/api/is-alive', isAuthorized, (req, res) => {
