@@ -28,7 +28,7 @@ const PcAlive = () => {
   useEffect(() => {
     const checkPcAliveInterval = setInterval(() => {
       checkPcAlive();
-    }, 5000);
+    }, 2000);
     return () => clearInterval(checkPcAliveInterval);
   }, [])
 

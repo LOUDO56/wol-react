@@ -61,7 +61,7 @@ app.post('/api/pc/action', isAuthorized, (req, res) => {
             cmd = "shutdown -s -f -t 1"
             break;
         case "hibernate":
-            cmd = 'shutdown -h'
+            cmd = 'timeout /t 2 /nobreak && rundll32.exe powrprof.dll,SetSuspendState Hibernate'
             break;
     }
     exec(cmd, (err, stdout, stderr) => {
