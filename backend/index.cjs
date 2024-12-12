@@ -1,10 +1,10 @@
-import express from "express";
-import jwt from 'jsonwebtoken';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import cookieParser from "cookie-parser";
-import { exec } from 'child_process';
-import ping from 'ping';
+const express = require("express");
+const jwt = require('jsonwebtoken');
+const cors = require('cors');
+const dotenv = require('dotenv');
+const cookieParser = require("cookie-parser");
+const { exec } = require('child_process');
+const ping = require('ping');
 
 dotenv.config({ path: '.env' });
 const app = express();
@@ -15,7 +15,7 @@ app.use(cors({
     credentials: true
 }));
 app.use(cookieParser());
-const localIp = '192.168.1.25'
+const localIp = '192.168.0.233'
 
 const isAuthorized = (req, res, next) => {
     const authHeader = req.headers['authorization'];
@@ -92,7 +92,7 @@ app.post('/api/login', (req, res) => {
         res.cookie('token', token, {
             maxAge: 30 * 24 * 60 * 60 * 1000
         })
-        return res.sendStatus(200);
+        return res.status(200).json({ status: "Login successfull!" });
     } else {
         return res.status(403).json({ error: "Wrong password." });
     }

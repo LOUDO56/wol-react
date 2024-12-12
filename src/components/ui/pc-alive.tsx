@@ -6,7 +6,7 @@ import { FaQuestion } from 'react-icons/fa';
 const PcAlive = () => {
 
   const [pcAlive, isPcAlive] = useState(false);
-  const [serverUp, isServerUp] = useState(true);
+  const [serverUp, isServerUp] = useState(false);
 
   async function checkPcAlive() {
     try {

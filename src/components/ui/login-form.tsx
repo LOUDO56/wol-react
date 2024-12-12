@@ -29,7 +29,9 @@ const LoginForm = () => {
       })
   
       const result = await res.json();
-      setErrors({ password: result.error })
+      if(result.error) {
+        setErrors({ password: result.error })
+      }
 
       if(res.ok){
         window.location.reload();
